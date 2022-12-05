@@ -1,24 +1,35 @@
 #include <stdio.h>
+#include<stdlib.h>
 #include<string.h>
 #include<unistd.h>
 #include <sys/socket.h>
 #include<arpa/inet.h>
+#include "config.h"
+
+
+#define FROOT "chs.cfg"
+
+
+
+
 
 
 int main(int argc , char *argv[])
 {
     //Creating socket
+    struct config configuration;
+    int port;
+    char root[100];
+    configuration = cfg(FROOT);
+    port = configuration.port;
+
 	int d_socket,c_socket,len;
     struct sockaddr_in server , client;
 	char *message="HTTP/1.1 200 OK\n"
                     "Date: Thu, 4 Dec 2022 3:14:55 GMT\n"
-                    "Server: Apache/2.2.3\n"
+                    "Server: c_http_server\n"
                     "Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
-                    "ETag: \"56d-9989200-1132c580\"\n"
-                    "Content-Type: text/html\n"
-                    "Content-Length: 103\n"
-                    "Accept-Ranges: bytes\n"
-                    "Connection: close\n"
+                    "Content-Type: text/html;charset=utf-8\n"
                     "\n"
                     "<!DOCTYPE html><html><head><title> C Web Server </title></head><body><h1>Hello World<h1></body></html>";
 
@@ -27,7 +38,7 @@ int main(int argc , char *argv[])
 
     server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons( 8888 );
+	server.sin_port = htons( port );
 
 
     if(d_socket < 0){
