@@ -45,7 +45,7 @@ struct http getreqdata(char *response){
                 httpv[j]='\0';
                 strcpy(data.httpv,httpv);
                 done=3;
-                i++;
+                i=+7;
                 j=0;
             }
         }
