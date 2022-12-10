@@ -1,5 +1,8 @@
-#include<string.h>
 
+#include "responseheader.h"
+#include "./config.h"
+#include"dynamicbuff.h"
+#include"./../applications/temp.h"
 
 struct http{
     char method[100];
@@ -45,7 +48,7 @@ struct http getreqdata(char *response){
                 httpv[j]='\0';
                 strcpy(data.httpv,httpv);
                 done=3;
-                i=+7;
+                i=i+7;
                 j=0;
             }
         }
@@ -80,3 +83,33 @@ struct http getreqdata(char *response){
     }
     return data;
 };
+
+
+char *rtc(struct http creq,struct config configuration){
+    getready();
+    char path[255];
+    FILE *fp;
+    char *buff;
+    static char buff1[10000];
+    int size=0;
+    strcpy(path,exPath(creq.pathdata,configuration.root));
+    printf("%s",path);
+    fp = fopen(path,"r");
+    if(fp == NULL){
+        strcpy(buff1,header(1));
+        strcat(buff1,"404");
+    }else{
+        fseek(fp,0L,SEEK_END);
+        size=ftell(fp);
+        fseek(fp,0L,SEEK_SET);
+        buff = (char *)malloc(size);
+        fread(buff,1,size,fp);
+        fclose(fp);
+        strcpy(buff1,header(1));
+        strcat(buff1,getdynamic(buff,fnc,MAXF));
+        free(buff);
+    }
+
+    return buff1;
+
+}
