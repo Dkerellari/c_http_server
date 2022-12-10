@@ -5,8 +5,9 @@
 #include <sys/socket.h>
 #include<arpa/inet.h>
 
-#include "config.h"
+
 #include "functions/client_response.h"
+
 
 #define FROOT "chs.cfg"
 
@@ -16,25 +17,26 @@
 
 
 int main(int argc , char *argv[]){
+
+    
+
+
+    
     //Creating socket
     struct config configuration;
     int port;
-    char root[100];
+    char root[100],fpath[255];
+    FILE *clientfile;
     configuration = cfg(FROOT);
     port = configuration.port;
 
 	int d_socket,c_socket,len;
     struct sockaddr_in server , client;
-
     struct http crequest;
     char request[1012];
-	char *response="HTTP/1.1 200 OK\n"
-                    "Date: Thu, 4 Dec 2022 3:14:55 GMT\n"
-                    "Server: c_http_server\n"
-                    "Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
-                    "Content-Type: text/html;charset=utf-8\n"
-                    "\n"
-                    "<!DOCTYPE html><html><head><title> C Web Server </title></head><body><h1>Hello World<h1></body></html>";
+    
+    char response1[10000];
+
 
 	d_socket = socket(AF_INET , SOCK_STREAM , 0);
 
@@ -67,11 +69,12 @@ int main(int argc , char *argv[]){
     while(c_socket = accept(d_socket, (struct sockaddr *)&client, &len)){
         if((read(c_socket,request,255)) > 0){
             crequest = getreqdata(request);
+            strcpy(response1,rtc(crequest,configuration));
         }else{
             printf("\nError:\nFailed to read client request!\n");
         }
 
-	    write(c_socket , response , strlen(response));
+	    write(c_socket , response1 , strlen(response1));
         close(c_socket);
         break;
     }
