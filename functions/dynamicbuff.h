@@ -13,7 +13,7 @@ char *getdynamic(char *buff , struct functions *fnc,int maxvars){
     char varvalue[255];
     while(i < len){
         if(buff[i]=='{' && buff[i+1]=='{'){
-            
+            k=0;
             i=i+2;
             while(buff[i]!='}'){
                 varname[k]=buff[i];
