@@ -21,7 +21,7 @@ char *getdynamic(char *buff , struct functions *fnc,int maxvars){
                 i++;
             }
             i=i+1;
-            varname[k+1] = '\0';
+            varname[k] = '\0';
             k=0;
             while(k <= maxvars){
                 if(strcmp(fnc[k].varname,varname)==0){
@@ -33,9 +33,9 @@ char *getdynamic(char *buff , struct functions *fnc,int maxvars){
                         m++;
                         j++;
                     }
-                    if(m == length){
-                        j--;
-                    }
+                    
+                    j--;
+                    
                 }
                 k++;
             }
@@ -46,7 +46,7 @@ char *getdynamic(char *buff , struct functions *fnc,int maxvars){
         i++;
         j++;
     }
-    rbuff[j+1]='\0';
+    rbuff[j]='\0';
     return rbuff;
 
 }
