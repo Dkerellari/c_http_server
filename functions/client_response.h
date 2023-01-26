@@ -84,20 +84,40 @@ struct http getreqdata(char *response){
     return data;
 };
 
+struct responsetocl{
+    char *buff;
+    int len;
+};
 
-char *rtc(struct http creq,struct config configuration){
+struct responsetocl rtc(struct http creq,struct config configuration){
     getready();
     char path[255];
     FILE *fp;
     char *buff;
-    static char buff1[10000];
-    int size=0;
+    char ext[255];
+    char headerstr[4000];
+    static char buff1[4000000],lenofdata[4000000];
+    static struct responsetocl responsetoclfnc;
+    int size=0,lenbuff,getdynamiccheck=1,headerlen=0;
     strcpy(path,exPath(creq.pathdata,configuration.root));
-    printf("%s",path);
+    strcpy(ext,strrchr(path, '.'));
+    if (!ext) {
+        strcpy(ext , ".html\0");
+    }else{
+        if((strcmp(ext,".png")==0) || (strcmp(ext,".jpg")==0) || (strcmp(ext,".jpeg")==0) || (strcmp(ext,".webp")==0)){
+            getdynamiccheck=0;
+        }
+    }
+    //printf("%s",path);
     fp = fopen(path,"r");
     if(fp == NULL){
-        strcpy(buff1,header(1));
-        strcat(buff1,"404");
+        size = 4;
+        strcpy(ext,".html");
+        strcpy(buff1,header(ext,4,size));
+        headerlen = strlen(buff1);
+        strcat(buff1,"404\0");
+        getdynamiccheck = 1;
+        responsetoclfnc.len = size + headerlen;
     }else{
         fseek(fp,0L,SEEK_END);
         size=ftell(fp);
@@ -105,11 +125,22 @@ char *rtc(struct http creq,struct config configuration){
         buff = (char *)malloc(size);
         fread(buff,1,size,fp);
         fclose(fp);
-        strcpy(buff1,header(1));
-        strcat(buff1,getdynamic(buff,fnc,MAXF));
+        if(getdynamiccheck==1){
+            strcpy(lenofdata,getdynamic(buff,fnc,MAXF));
+            lenbuff = strlen(lenofdata);
+            strcpy(buff1,header(ext,lenbuff,size));
+            headerlen = strlen(buff1);
+            strcat(buff1,getdynamic(buff,fnc,MAXF));
+            responsetoclfnc.len = lenbuff + headerlen;
+        }else{
+            strcpy(buff1,header(ext,lenbuff,size));
+            headerlen = strlen(buff1);
+            memcpy(buff1+headerlen,buff,size);
+            responsetoclfnc.len = size + headerlen;
+        }
         free(buff);
     }
-
-    return buff1;
+    responsetoclfnc.buff = buff1;
+    return responsetoclfnc;
 
 }
